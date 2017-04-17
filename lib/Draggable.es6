@@ -209,6 +209,17 @@ export default class Draggable extends React.Component {
     }
   }
 
+  componentDidUpdate(prevProps: Object, prevState: Object) {
+    if(JSON.stringify(prevProps.bounds) !== JSON.stringify(this.props.bounds)) {
+      let { x, y } = this.state;
+      let newState = { x, y };
+
+      this.constrainToBounds(newState, x, y);
+
+      this.setState(newState);
+    }
+  }
+
   componentWillUnmount() {
     this.setState({dragging: false}); // prevents invariant if unmounted while dragging
   }
@@ -240,19 +251,7 @@ export default class Draggable extends React.Component {
       // Save original x and y.
       const {x, y} = newState;
 
-      // Add slack to the values used to calculate bound position. This will ensure that if
-      // we start removing slack, the element won't react to it right away until it's been
-      // completely removed.
-      newState.x += this.state.slackX;
-      newState.y += this.state.slackY;
-
-      // Get bound position. This will ceil/floor the x and y within the boundaries.
-      // $FlowBug
-      [newState.x, newState.y] = getBoundPosition(this, newState.x, newState.y);
-
-      // Recalculate slack by noting how much was shaved by the boundPosition handler.
-      newState.slackX = this.state.slackX + (x - newState.x);
-      newState.slackY = this.state.slackY + (y - newState.y);
+      this.constrainToBounds(newState, x, y);
 
       // Update the event we fire to reflect what really happened after bounds took effect.
       uiData.x = x;
@@ -267,6 +266,22 @@ export default class Draggable extends React.Component {
 
     this.setState(newState);
   };
+
+  constrainToBounds = (newState: Object, x: number, y: number) => {
+    // Add slack to the values used to calculate bound position. This will ensure that if
+    // we start removing slack, the element won't react to it right away until it's been
+    // completely removed.
+    newState.x += this.state.slackX;
+    newState.y += this.state.slackY;
+
+    // Get bound position. This will ceil/floor the x and y within the boundaries.
+    // $FlowBug
+    [newState.x, newState.y] = getBoundPosition(this, newState.x, newState.y);
+
+    // Recalculate slack by noting how much was shaved by the boundPosition handler.
+    newState.slackX = this.state.slackX + (x - newState.x);
+    newState.slackY = this.state.slackY + (y - newState.y);
+  }
 
   onDragStop: DraggableEventHandler = (e, coreData) => {
     if (!this.state.dragging) return false;

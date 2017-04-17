@@ -52,16 +52,16 @@ return /******/ (function(modules) { // webpackBootstrap
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	module.exports = __webpack_require__(1).default;
 	module.exports.DraggableCore = __webpack_require__(9).default;
 
-/***/ },
+/***/ }),
 /* 1 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -168,25 +168,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var _x = newState.x,
 	            _y = newState.y;
 	
-	        // Add slack to the values used to calculate bound position. This will ensure that if
-	        // we start removing slack, the element won't react to it right away until it's been
-	        // completely removed.
 	
-	        newState.x += _this.state.slackX;
-	        newState.y += _this.state.slackY;
-	
-	        // Get bound position. This will ceil/floor the x and y within the boundaries.
-	        // $FlowBug
-	
-	        // Recalculate slack by noting how much was shaved by the boundPosition handler.
-	        var _getBoundPosition = (0, _positionFns.getBoundPosition)(_this, newState.x, newState.y);
-	
-	        var _getBoundPosition2 = _slicedToArray(_getBoundPosition, 2);
-	
-	        newState.x = _getBoundPosition2[0];
-	        newState.y = _getBoundPosition2[1];
-	        newState.slackX = _this.state.slackX + (_x - newState.x);
-	        newState.slackY = _this.state.slackY + (_y - newState.y);
+	        _this.constrainToBounds(newState, _x, _y);
 	
 	        // Update the event we fire to reflect what really happened after bounds took effect.
 	        uiData.x = _x;
@@ -200,6 +183,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (shouldUpdate === false) return false;
 	
 	      _this.setState(newState);
+	    };
+	
+	    _this.constrainToBounds = function (newState, x, y) {
+	      // Add slack to the values used to calculate bound position. This will ensure that if
+	      // we start removing slack, the element won't react to it right away until it's been
+	      // completely removed.
+	      newState.x += _this.state.slackX;
+	      newState.y += _this.state.slackY;
+	
+	      // Get bound position. This will ceil/floor the x and y within the boundaries.
+	      // $FlowBug
+	
+	      // Recalculate slack by noting how much was shaved by the boundPosition handler.
+	      var _getBoundPosition = (0, _positionFns.getBoundPosition)(_this, newState.x, newState.y);
+	
+	      var _getBoundPosition2 = _slicedToArray(_getBoundPosition, 2);
+	
+	      newState.x = _getBoundPosition2[0];
+	      newState.y = _getBoundPosition2[1];
+	      newState.slackX = _this.state.slackX + (x - newState.x);
+	      newState.slackY = _this.state.slackY + (y - newState.y);
 	    };
 	
 	    _this.onDragStop = function (e, coreData) {
@@ -274,6 +278,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // Set x/y if position has changed
 	      if (nextProps.position && (!this.props.position || nextProps.position.x !== this.props.position.x || nextProps.position.y !== this.props.position.y)) {
 	        this.setState({ x: nextProps.position.x, y: nextProps.position.y });
+	      }
+	    }
+	  }, {
+	    key: 'componentDidUpdate',
+	    value: function componentDidUpdate(prevProps, prevState) {
+	      if (JSON.stringify(prevProps.bounds) !== JSON.stringify(this.props.bounds)) {
+	        var _state = this.state,
+	            _x3 = _state.x,
+	            _y3 = _state.y;
+	
+	        var newState = { x: _x3, y: _y3 };
+	
+	        this.constrainToBounds(newState, _x3, _y3);
+	
+	        this.setState(newState);
 	      }
 	    }
 	  }, {
@@ -459,21 +478,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.default = Draggable;
 
-/***/ },
+/***/ }),
 /* 2 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	module.exports = __WEBPACK_EXTERNAL_MODULE_2__;
 
-/***/ },
+/***/ }),
 /* 3 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	module.exports = __WEBPACK_EXTERNAL_MODULE_3__;
 
-/***/ },
+/***/ }),
 /* 4 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
 	  Copyright (c) 2016 Jed Watson.
@@ -525,9 +544,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	}());
 
 
-/***/ },
+/***/ }),
 /* 5 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -705,6 +724,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	// Note we're passing `document` b/c we could be iframed
 	function addUserSelectStyles(body /*: HTMLElement*/) {
 	  var style = body.getAttribute('style') || '';
+	  if (userSelectReplaceRegExp.test(style)) return; // don't add twice
 	  body.setAttribute('style', style + userSelectStyle);
 	}
 	
@@ -723,9 +743,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, childStyle);
 	}
 
-/***/ },
+/***/ }),
 /* 6 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	'use strict';
 	
@@ -763,9 +783,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	}
 
-/***/ },
+/***/ }),
 /* 7 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	'use strict';
 	
@@ -824,9 +844,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	// can handle unprefixed `transform`, but not unprefixed `user-select`
 	exports.default = getPrefix();
 
-/***/ },
+/***/ }),
 /* 8 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -879,10 +899,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var boundNodeStyle = ownerWindow.getComputedStyle(boundNode);
 	    // Compute bounds. This is a pain with padding and offsets but this gets it exactly right.
 	    bounds = {
-	      left: -node.offsetLeft + (0, _shims.int)(boundNodeStyle.paddingLeft) + (0, _shims.int)(nodeStyle.borderLeftWidth) + (0, _shims.int)(nodeStyle.marginLeft),
-	      top: -node.offsetTop + (0, _shims.int)(boundNodeStyle.paddingTop) + (0, _shims.int)(nodeStyle.borderTopWidth) + (0, _shims.int)(nodeStyle.marginTop),
-	      right: (0, _domFns.innerWidth)(boundNode) - (0, _domFns.outerWidth)(node) - node.offsetLeft,
-	      bottom: (0, _domFns.innerHeight)(boundNode) - (0, _domFns.outerHeight)(node) - node.offsetTop
+	      left: -node.offsetLeft + (0, _shims.int)(boundNodeStyle.paddingLeft) + (0, _shims.int)(nodeStyle.marginLeft),
+	      top: -node.offsetTop + (0, _shims.int)(boundNodeStyle.paddingTop) + (0, _shims.int)(nodeStyle.marginTop),
+	      right: (0, _domFns.innerWidth)(boundNode) - (0, _domFns.outerWidth)(node) - node.offsetLeft + (0, _shims.int)(boundNodeStyle.paddingRight) - (0, _shims.int)(nodeStyle.marginRight),
+	      bottom: (0, _domFns.innerHeight)(boundNode) - (0, _domFns.outerHeight)(node) - node.offsetTop + (0, _shims.int)(boundNodeStyle.paddingBottom) - (0, _shims.int)(nodeStyle.marginBottom)
 	    };
 	  }
 	
@@ -968,9 +988,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 	}
 
-/***/ },
+/***/ }),
 /* 9 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
 	
@@ -1130,8 +1150,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	          y = position.y;
 	
 	      // Snap to grid if prop has been provided
-	
-	      if (x !== x) debugger;
 	
 	      if (Array.isArray(_this.props.grid)) {
 	        var deltaX = x - _this.state.lastX,
@@ -1396,9 +1414,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = DraggableCore;
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(10)))
 
-/***/ },
+/***/ }),
 /* 10 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	// shim for using process in browser
 	var process = module.exports = {};
@@ -1582,9 +1600,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	process.umask = function() { return 0; };
 
 
-/***/ },
+/***/ }),
 /* 11 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	
@@ -1600,7 +1618,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if ((undefined)) (_console = console).log.apply(_console, arguments);
 	}
 
-/***/ }
+/***/ })
 /******/ ])
 });
 ;
